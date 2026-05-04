@@ -1,0 +1,44 @@
+[project]
+name = "archtec-segmentation"
+version = "0.1.0"
+description = "Traditional building component detector using YOLOv11 instance segmentation"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+
+dependencies = [
+    # Core inference
+    "torch>=2.11.0",
+    "torchvision>=0.26.0",
+    "torchaudio>=2.11.0",
+    "ultralytics>=8.0.0",
+
+    # Image processing
+    "pillow>=12.2.0",
+    "numpy>=1.26.0,<2.0.0",
+    "opencv-python>=4.10.0",
+
+    # Streamlit UI
+    "streamlit>=1.56.0",
+
+    # Charts & visualization
+    "plotly>=5.20.0",
+    "pandas>=2.0.0",
+]
+
+[project.optional-dependencies]
+# macOS Metal GPU acceleration (Apple Silicon only)
+metal = [
+    "tensorflow-macos>=2.16.2",
+    "tensorflow-metal>=1.2.0",
+]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-mock>=3.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
