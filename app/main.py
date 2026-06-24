@@ -2,8 +2,15 @@
 ArchTec Segmentation — Streamlit App
 """
 
+from pathlib import Path
+import sys
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 import streamlit as st
-from app.config import APP_CONFIG, MODEL_OPTIONS
+from app.config import APP_CONFIG, DEFAULT_MODEL_VERSION, DEFAULT_TASK, MODEL_OPTIONS
 
 st.set_page_config(
     page_title=APP_CONFIG["page_title"],
@@ -15,14 +22,7 @@ st.markdown("""
 <style>
     .block-container { padding-top: 2rem; }
     .app-hero { padding: 2rem 0 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.07); margin-bottom: 1.5rem; }
-    .app-hero-badge {
-        display: inline-flex; align-items: center; gap: 6px;
-        background: rgba(79,195,247,0.12); border: 1px solid rgba(79,195,247,0.3);
-        border-radius: 20px; padding: 4px 12px; font-size: 0.72rem;
-        font-weight: 600; color: #4FC3F7; letter-spacing: 0.06em;
-        text-transform: uppercase; margin-bottom: 12px;
-    }
-    .app-hero h1 { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.03em; margin: 0 0 8px; color: #f5f5f5; }
+    .app-hero h1 { font-size: 2.75rem; font-weight: 800; letter-spacing: -0.03em; margin: 0 0 12px; color: #f5f5f5; }
     .app-hero p  { color: #757575; margin: 0; font-size: 1rem; line-height: 1.5; }
     .stTabs [data-baseweb="tab-list"] {
         gap: 4px; background: transparent; padding: 0;
@@ -50,10 +50,8 @@ st.markdown("""
 st.markdown(
     f"""
     <div class="app-hero">
-        <div class="app-hero-badge">🏛️ Instance Segmentation · YOLOv11</div>
         <h1>{APP_CONFIG['page_title']}</h1>
-        <p>Deteksi dan segmentasi otomatis komponen bangunan tradisional —
-           kolom, pintu, jendela, dan elemen struktural lainnya.</p>
+        <p>Powered by YOLO Object Detection and Instance Segmentation models (v8-v11), this system automatically identifies traditional architectural elements including roofs, columns, walls, doors, windows, stairs, and ornamental details. Users can select different YOLO versions and inference tasks to analyze building structures and visualize detected components in real time.</p>
     </div>
     """,
     unsafe_allow_html=True,
@@ -63,7 +61,7 @@ st.markdown(
 tab_detector, tab_training, tab_how = st.tabs([
     "🏛️  Detector",
     "📈  Training Results",
-    "🔬  How YOLOv11 Works",
+    "🔬  How YOLO Works",
 ])
 
 with tab_detector:
@@ -72,8 +70,11 @@ with tab_detector:
 
 with tab_training:
     from pages.tab_training import render as render_training
-    # Baca csv sesuai model yang dipilih user di sidebar
-    selected_key = st.session_state.get("selected_model_key", list(MODEL_OPTIONS.keys())[-1])
+    # Read the CSV that matches the model selected in the sidebar.
+    default_model_key = f"{DEFAULT_TASK} · {DEFAULT_MODEL_VERSION}"
+    selected_key = st.session_state.get("selected_model_key", default_model_key)
+    if selected_key not in MODEL_OPTIONS:
+        selected_key = default_model_key
     csv_path = MODEL_OPTIONS[selected_key]["results"]
     render_training(csv_path=csv_path)
 

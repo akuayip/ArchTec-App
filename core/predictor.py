@@ -113,11 +113,13 @@ def parse_detections(result) -> list[dict]:
     has_masks = result.masks is not None
 
     for box in result.boxes:
+        class_id = int(box.cls[0] if hasattr(box.cls, "__len__") else box.cls)
+        confidence = float(box.conf[0] if hasattr(box.conf, "__len__") else box.conf)
         detections.append(
             {
-                "class_id":   int(box.cls),
-                "class_name": names[int(box.cls)],
-                "confidence": float(box.conf),
+                "class_id":   class_id,
+                "class_name": names[class_id],
+                "confidence": confidence,
                 "bbox_xyxy":  box.xyxy[0].tolist(),
                 "has_mask":   has_masks,
             }

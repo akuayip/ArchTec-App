@@ -1,158 +1,202 @@
 # ArchTec Segmentation
 
-## 📋 Overview
+ArchTec Segmentation is a Streamlit-based application for analyzing traditional architectural elements using YOLO Object Detection and Instance Segmentation models.
 
-**ArchTec Segmentation** adalah aplikasi deteksi dan segmentasi komponen bangunan tradisional menggunakan teknologi **YOLOv11**. Proyek ini menggabungkan kekuatan machine learning modern dengan antarmuka web yang user-friendly untuk mengidentifikasi elemen-elemen arsitektur pada gambar bangunan.
+Powered by YOLO Object Detection and Instance Segmentation models (v8-v11), this system automatically identifies traditional architectural elements including roofs, columns, walls, doors, windows, stairs, and ornamental details. Users can select different YOLO versions and inference tasks to analyze building structures and visualize detected components in real time.
 
-### Apa itu Proyek Ini?
+## Features
 
-Bayangkan Anda memiliki foto sebuah bangunan tradisional, dan ingin mengetahui bagian-bagian mana yang merupakan komponen khusus (seperti kolom, jendela, atap, dll). Aplikasi ini akan:
+- Select inference task: Object Detection or Instance Segmentation.
+- Select YOLO version based on the active task.
+- Default inference setup: Object Detection with YOLOv8.
+- Upload traditional building images in JPG, JPEG, or PNG format.
+- Adjust Confidence Threshold and IoU Threshold from the sidebar.
+- Visualize annotated prediction results in real time.
+- View detection summaries, confidence charts, and optional detection tables.
+- Review training metrics from the `results.csv` file associated with the selected model.
+- Read a dynamic "How YOLO Works" explanation focused on Backbone, Neck, and Head for the selected YOLO version and task.
 
-- 🖼️ **Menganalisis gambar** yang Anda upload
-- 🎯 **Mendeteksi** komponen bangunan secara otomatis
-- 📍 **Menandai area** masing-masing komponen dengan presisi tinggi
-- 📊 **Menampilkan hasil** dalam antarmuka yang mudah dipahami
+## Available Models
 
-Aplikasi dibangun dengan stack modern:
-- **Backend**: Python + PyTorch (untuk machine learning)
-- **Frontend**: Streamlit (antarmuka web interaktif)
-- **Model**: YOLOv11 (arsitektur deep learning terdepan untuk deteksi objek)
+The app expects model files under the `model/` directory:
 
-## 🚀 Cara Menjalankan
-
-### Prasyarat
-
-Sebelum memulai, pastikan Anda memiliki:
-- **Python 3.9+** terinstall di sistem
-- **Git** untuk cloning repository
-- **uv** (package manager Python yang cepat) - [Install di sini](https://github.com/astral-sh/uv)
-
-### Langkah-Langkah Menjalankan
-
-#### 1️⃣ Persiapan Awal
-```bash
-# Clone repository
-git clone <repository-url>
-cd ArchTec-Segmentation
-
-# Install semua dependencies
-uv sync
+```text
+model/
+├── Object Detection/
+│   ├── YOLOv8-Nano-Detect/
+│   │   ├── best.pt
+│   │   └── results.csv
+│   ├── YOLOv9-Tiny-Detect/
+│   │   ├── best.pt
+│   │   └── results.csv
+│   ├── YOLOv10-Nano-Detect/
+│   │   ├── best.pt
+│   │   └── results.csv
+│   └── YOLOv11-Nano-Detect/
+│       ├── best.pt
+│       └── results.csv
+│
+└── Segmentation/
+    ├── YOLOv8-Nano-Segment/
+    │   ├── best.pt
+    │   └── results.csv
+    ├── YOLOv9-Compact-Segment/
+    │   ├── best.pt
+    │   └── results.csv
+    └── YOLOv11-Nano-Segment/
+        ├── best.pt
+        └── results.csv
 ```
 
-#### 2️⃣ Verifikasi Lingkungan
-```bash
-# Pastikan PyTorch dan dependencies lainnya terinstall dengan benar
-python scripts/check_env.py
-```
+Model weight files such as `.pt`, `.onnx`, `.engine`, `.torchscript`, `.tflite`, `.pb`, and `.h5` are ignored by Git because they are usually large binary artifacts. Keep `results.csv` files tracked if you want the Training Results tab to work without requiring users to regenerate training logs.
 
-Jika semua berjalan lancar, Anda akan melihat output yang mengonfirmasi instalasi PyTorch dan package lainnya.
+## Getting Started
 
-#### 3️⃣ Jalankan Aplikasi
+### Option 1: Conda
+
+If you already have the project environment:
+
 ```bash
-# Mulai server Streamlit
+conda activate arch
 streamlit run app/main.py
 ```
 
-Setelah ini, aplikasi akan otomatis terbuka di browser Anda pada `http://localhost:8501`
-
-### Akses Aplikasi
-
-- **URL Lokal**: http://localhost:8501
-- **Fitur Utama**:
-  - Pilih model (v1 atau v2)
-  - Upload gambar bangunan
-  - Atur confidence threshold & NMS IoU
-  - Lihat hasil segmentasi real-time
-
-## ⚙️ Konfigurasi
-
-Semua pengaturan aplikasi dapat disesuaikan di file **`app/config.py`**:
-
-| Parameter | Deskripsi |
-|-----------|-----------|
-| `MODEL_CONFIG["path"]` | Path ke file model weights (.pt) |
-| `MODEL_CONFIG["default_conf"]` | Confidence threshold default (0-1) |
-| `MODEL_CONFIG["default_iou"]` | NMS IoU threshold untuk mengurangi duplikat deteksi |
-
-**Contoh pengaturan confidence threshold**: Nilai lebih tinggi = deteksi lebih ketat (hanya objek yang sangat yakin), nilai lebih rendah = deteksi lebih sensitif.
-
-## 🧪 Menjalankan Tests
-
-Untuk memastikan semuanya berfungsi dengan baik, jalankan unit tests:
+To run commands without activating the shell:
 
 ```bash
-uv run pytest
+conda run -n arch python -m pytest tests/
+conda run -n arch streamlit run app/main.py
 ```
 
-Ini akan menjalankan semua test di folder `tests/` dan melaporkan hasilnya.
+### Option 2: uv
 
-## 📁 Struktur Direktori Detail
+Install dependencies:
 
+```bash
+uv sync
 ```
+
+Run the app:
+
+```bash
+uv run streamlit run app/main.py
+```
+
+The application will be available at:
+
+```text
+http://localhost:8501
+```
+
+## Configuration
+
+Model paths, defaults, and inference settings are centralized in:
+
+```text
+app/config.py
+```
+
+Important configuration entries:
+
+| Config | Purpose |
+|---|---|
+| `TASK_MODEL_OPTIONS` | Maps each task and YOLO version to its model weight and training results CSV |
+| `DEFAULT_TASK` | Default selected task, currently `Object Detection` |
+| `DEFAULT_MODEL_VERSION` | Default selected YOLO version, currently `YOLOv8` |
+| `MODEL_CONFIG["default_conf"]` | Default confidence threshold |
+| `MODEL_CONFIG["default_iou"]` | Default IoU threshold |
+| `MODEL_CONFIG["imgsz"]` | Inference image size |
+
+## Project Structure
+
+```text
 ArchTec-Segmentation/
-│
-├── app/                          # Layer UI (Streamlit)
-│   ├── main.py                   # Entry point - jalankan dengan streamlit
-│   ├── config.py                 # Konfigurasi aplikasi & model (edit di sini)
+├── app/
+│   ├── main.py                 # Streamlit entry point
+│   ├── config.py               # App and model configuration
 │   └── __init__.py
 │
-├── core/                         # Logic ML (loading model, inference, post-processing)
-│   ├── predictor.py              # Class untuk melakukan prediksi
+├── core/
+│   ├── predictor.py            # YOLO loading, inference, plotting, and parsing
 │   └── __init__.py
 │
-├── utils/                        # Helper functions
-│   ├── device.py                 # Deteksi device PyTorch (CPU/GPU/MPS)
+├── pages/
+│   ├── tab_detector.py         # Inference UI
+│   ├── tab_training.py         # Training metrics visualization
+│   ├── tab_how_it_works.py     # Dynamic YOLO architecture explanation
 │   └── __init__.py
 │
-├── models/                       # Model weight files (.pt) - tidak di-track git
-│   ├── train_v1.pt               # Model versi 1
-│   ├── train_v2.pt               # Model versi 2
-│   ├── results_v1.csv            # Hasil training v1
-│   └── results_v2.csv            # Hasil training v2
+├── assets/
+│   ├── arsitektur.png          # Temporary architecture diagram placeholder
+│   └── yolov11_pipeline.png    # YOLOv11 pipeline image
 │
-├── pages/                        # Halaman-halaman Streamlit tambahan
-│   ├── tab_detector.py           # Tab untuk deteksi/prediksi
-│   ├── tab_how_it_works.py       # Tab penjelasan cara kerja
-│   ├── tab_training.py           # Tab info training
-│   └── __init__.py
-│
-├── tests/                        # Unit tests dengan pytest
-│   ├── test_predictor.py         # Test untuk predictor
-│   └── __init__.py
-│
-├── scripts/                      # Script one-off untuk development/ops
-│   └── check_env.py              # Verifikasi PyTorch & dependency
-│
-├── assets/                       # Aset statis (gambar, dll)
-│
-├── pyproject.toml                # Dependency configuration (uv)
-│
-└── README.md                     # File ini
+├── model/                      # Local model folders and training CSV files
+├── tests/                      # Pytest smoke tests
+├── scripts/                    # Utility scripts
+├── utils/                      # Helper modules
+├── pyproject.toml
+├── uv.lock
+└── README.md
 ```
 
-## 💡 Tips & Troubleshooting
+## Tests
 
-### GPU tidak terdeteksi?
-Jalankan `python scripts/check_env.py` untuk diagnostik. Pastikan CUDA compatible GPU driver terinstall.
+Run the test suite with the conda environment:
 
-### Dependencies tidak ter-install?
 ```bash
-# Clear cache dan reinstall
-rm -rf .venv
-uv sync --refresh
+conda run -n arch python -m pytest tests/
 ```
 
-### Port 8501 sudah digunakan?
+Or with uv:
+
+```bash
+uv run pytest tests/
+```
+
+## Model File Policy
+
+Model weights are intentionally excluded from Git via `.gitignore`.
+
+Ignored examples:
+
+- `model/**/*.pt`
+- `model/**/*.onnx`
+- `model/**/*.engine`
+- `model/**/*.torchscript`
+- `model/**/*.tflite`
+- `model/**/*.pb`
+- `model/**/*.h5`
+
+Recommended workflow:
+
+1. Keep source code, configuration, README, assets, and `results.csv` files in Git.
+2. Store large model weights outside Git, or use Git LFS if model files must be versioned.
+3. Place the model weights back into the expected `model/.../best.pt` paths before running inference.
+
+## Troubleshooting
+
+### Model does not appear in the selector
+
+Check that the expected `best.pt` file exists under the correct task and version folder in `model/`. The UI label is `Instance Segmentation`, while the local folder is currently named `model/Segmentation/`.
+
+### Training Results tab is empty or fails to load
+
+Check that the selected model folder contains a valid `results.csv` file.
+
+### Port 8501 is already in use
+
+Run Streamlit on another port:
+
 ```bash
 streamlit run app/main.py --server.port 8502
 ```
 
-## 📞 Support
+### Environment issues
 
-Untuk pertanyaan atau issue, silakan buka GitHub issue atau hubungi tim development.
+Run:
 
----
+```bash
+python scripts/check_env.py
+```
 
-**Terakhir diupdate**: 2026  
-**Versi Python**: 3.9+  
-**License**: [Sesuaikan sesuai kebutuhan]
+This checks whether key runtime dependencies such as PyTorch are available.

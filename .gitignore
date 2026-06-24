@@ -42,9 +42,25 @@ Thumbs.db
 .coverage
 htmlcov/
 
-# Model weights (large files - as per README)
-models/*.pt
-models/*.onnx
+# Model weights and exported model binaries
+model/**/*.pt
+model/**/*.onnx
+model/**/*.engine
+model/**/*.torchscript
+model/**/*.tflite
+model/**/*.pb
+model/**/*.h5
+models/**/*.pt
+models/**/*.onnx
+models/**/*.engine
+models/**/*.torchscript
+models/**/*.tflite
+models/**/*.pb
+models/**/*.h5
+
+# Training artifacts
+runs/
+wandb/
 
 # Streamlit
 .streamlit/secrets.toml
@@ -60,6 +76,6 @@ Thumbs.db
 pip-log.txt
 pip-delete-this-directory.txt
 
-# Results/outputs (optional, jika ingin ignore hasil)
+# Results/outputs
 results/
 outputs/
